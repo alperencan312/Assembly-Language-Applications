@@ -1,0 +1,717 @@
+################################## PART 1.1 ###########################################
+
+		.text
+
+invalid:	la $a0,prompt1
+		li $v0,4
+		syscall
+
+		li $v0,5
+		syscall
+
+		bgt $v0,20,invalid
+		blt $v0,1,invalid
+
+		move $t1,$v0 # t1 is the size of the array
+		move $t2,$t1 # t2 will be the counter
+
+		la $t0,array # t0 is the address of the array
+
+
+loopin:		beq $t2,0,display
+		la $a0,prompt2
+		li $v0,4
+		syscall
+		li $v0,5
+		syscall
+		sw $v0,0($t0)
+		addi $t0,$t0,4
+		subi $t2,$t2,1
+		j loopin
+	
+
+display:	la $t0,array
+		move $t2,$t1 # t2 will be the counter
+		la $a0,prompt3
+		li $v0,4
+		syscall
+
+loopout:	beq $t2,0,displayRev
+		lw $a0,0($t0)
+		li $v0,1
+		syscall
+		la $a0,space
+		li $v0,4
+		syscall
+		addi $t0,$t0,4
+		subi $t2,$t2,1
+		j loopout
+	
+	
+
+displayRev:	la $t0,array
+		move $t2,$t1 # t2 will be the counter
+		subi $t3,$t1,1 # t3 will be the counter for accesing the address of the last element
+		mul $t3,$t3,4
+		add $t0,$t0,$t3
+	
+		la $a0,prompt4
+		li $v0,4
+		syscall
+
+loopRev:	beq $t2,0,done
+		lw $a0,0($t0)
+		li $v0,1
+		syscall
+		la $a0,space
+		li $v0,4
+		syscall
+		subi $t0,$t0,4
+		subi $t2,$t2,1
+		j loopRev
+	
+
+done:		li $v0,10
+		syscall
+
+		.data
+		
+array: .space 80
+prompt1: .asciiz "Please enter the size of your array (MAX 20) : "
+prompt2: .asciiz "Please enter number : "
+prompt3: .asciiz "Your array in order         : "
+prompt4: .asciiz "\nYour array in reverse order : "
+space:   .asciiz " "
+	
+	
+	
+########################################## PART 1.2 ##############################################
+
+		.text
+
+invalid:	la $a0,prompt1
+		li $v0,4
+		syscall
+
+		li $v0,5
+		syscall
+
+		bgt $v0,20,invalid
+		blt $v0,2,invalid
+
+		move $t1,$v0 # t1 is the size of the array
+		move $t2,$t1 # t2 is the counter
+
+		la $t0,array # t0 is the address of the array
+
+
+loopin:		beq $t2,0,donein
+		la $a0,prompt2
+		li $v0,4
+		syscall
+		li $v0,5
+		syscall
+		sw $v0,0($t0)
+		addi $t0,$t0,4
+		subi $t2,$t2,1
+		j loopin
+	
+
+donein:		div $t3,$t1,2 #counter for checking
+		la $t0,array
+		subi $t4,$t1,1 #counter for accessing the address of the last element 
+		mul $t4,$t4,4
+		add $t5,$t0,$t4 #t5 points to the address of the last element
+
+
+loopcheck:	beq $t3,0,pal
+		lw $t6,0($t0)
+		lw $t7,0($t5)
+		bne $t6,$t7,notPal
+		addi $t0,$t0,4
+		subi $t5,$t5,4
+		subi $t3,$t3,1
+		j loopcheck
+
+
+pal:		la $a0,prompt3
+		li $v0,4
+		syscall
+		j exit
+
+notPal:		la $a0,prompt4
+		li $v0,4
+		syscall
+		j exit
+
+
+exit:	 	li $v0,10
+ 		syscall	
+ 
+		.data
+		
+array: .space 80
+prompt1: .asciiz "Please enter the size of your array (MIN 2 , MAX 20) : "
+prompt2: .asciiz "Please enter number : "
+prompt3: .asciiz "The array is palindrome."
+prompt4: .asciiz "The array is not palindrome."
+
+
+###################################### PART 1.3 ###################################
+
+		.text
+		
+		li $v0,4
+		la $a0,prompt1
+		syscall
+
+		li $v0,5
+		syscall
+
+		move $t0,$v0
+
+
+
+check:		li $v0,4
+		la $a0,prompt2
+		syscall
+
+		li $v0,5
+		syscall
+
+		beqz $v0,check
+
+		move $t1,$v0
+
+		#t2 will be the division
+		#t3 will be the remainder
+
+
+
+
+loop:		blt $t0,$t1,done
+		sub $t0,$t0,$t1
+		addi $t2,$t2,1
+		j loop
+
+done:		move $t3,$t0
+
+		li $v0,4
+		la $a0,prompt3
+		syscall
+
+		li $v0,1
+		move $a0,$t2
+		syscall
+
+		li $v0,4
+		la $a0,newLine
+		syscall
+
+		li $v0,4
+		la $a0,prompt4
+		syscall
+
+		li $v0,1
+		move $a0,$t3
+		syscall
+
+		li $v0,10
+		syscall
+
+		.data
+		
+prompt1: .asciiz "Please enter numerator              : "
+prompt2: .asciiz "Please enter denominator (except 0) : "
+prompt3: .asciiz "Division is  :"
+prompt4: .asciiz "Remainder is :"
+newLine: .asciiz "\n"
+
+########################################### PART 2 #########################################
+
+#################                   PART 2    Program 1                                     ######
+
+##
+## Program1.asm - prints out "hello world"
+##
+##	a0 - points to the string
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start 
+
+__start:		# execution starts here
+	la $a0,str	# put string address into a0
+	li $v0,4	# system call to print
+	syscall		#   out a string
+
+	li $v0,10  # system call to exit
+	syscall	#    bye bye
+
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+str:	.asciiz "HELLO TA\n"
+n:	.word	10
+
+##
+## end of file Program1.asm
+
+#################                     PART2   Program 2                                     ######
+
+##
+## Program2.asm asks user for temperature in Celsius,
+##  converts to Fahrenheit, prints the result.
+##
+##	v0 - reads in Celsius
+##	t0 - holds Fahrenheit result
+##	a0 - points to output strings
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start	
+
+__start:
+	la $a0,prompt	# output prompt message on terminal
+	li $v0,4	# syscall 4 prints the string
+	syscall
+
+	li $v0,5	# syscall 5 reads an integer
+	syscall
+
+	mul $t0,$v0,9	# to convert,multiply by 9,
+	div $t0,$t0,5	# divide by 5, then
+	add $t0,$t0,32	# add 32
+
+	la $a0,ans1	# print string before result
+	li $v0,4
+	syscall
+
+	move $a0,$t0	# print integer result
+	li $v0,1		# using syscall 1
+	syscall
+
+	la $a0,endl	# system call to print
+	li $v0,4		# out a newline
+	syscall
+
+	li $v0,10		# system call to exit
+	syscall		#    bye bye
+
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+prompt:	.asciiz "Enter temperature (Celsius): "
+ans1:	.asciiz "The temperature in Fahrenheit is "
+endl:	.asciiz "\n"
+
+##
+## end of file Program2.asm
+
+########################################### PART 3 #########################################
+
+##
+##	Program3.asm is a loop implementation
+##	of the Fibonacci function
+##        
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+.globl __start
+ 
+__start:
+	# execution starts here
+	li $v0,4
+	la $a0,enterNum
+	syscall
+	
+	li $v0,5
+	syscall
+	
+	
+	
+	move $a0,$v0
+	#li $a0,4	# to calculate fib for odd numbers and factorial for even numbers.
+	
+	li $t2,2
+	div $a0,$t2
+	mfhi $t3   # get the remainder
+	beq $t3,0,factorial # if number is even, go to factorial.
+		
+	
+	jal fib		# call fib if number is odd
+	move $a0,$v0	# print result
+	li $v0, 1
+	syscall
+
+	la $a0,endl	# print newline
+	li $v0,4
+	syscall
+
+	li $v0,10
+	syscall		# bye bye
+
+#------------------------------------------------
+
+
+fib:	move $v0,$a0	# initialise last element
+	blt $a0,2,done	# fib(0)=0, fib(1)=1
+
+	li $t0,0	# second last element
+	li $v0,1	# last element
+
+loop:	add $t1,$t0,$v0	# get next value
+	move $t0,$v0	# update second last
+	move $v0,$t1	# update last element
+	sub $a0,$a0,1	# decrement count
+	bgt $a0,1,loop	# exit loop when count=0
+done:	jr $ra
+
+#------------------------------------------------
+
+
+		
+factorial:	move $t4,$a0 # move the number to t4
+		beq $t4,0,specialCase
+		subi $t6,$t4,1 # number minus 1 = t6 
+		mul $t5,$t4,$t6 # multiplication is stored in t5
+		
+loop2:		beq $t6,1,done2 # after decrementing t6, loop ends when last number is 1
+		subi $t6,$t6,1 # decrementing t6 by 1
+		mul $t5,$t5,$t6 #multiplying t6 by previous multiplication
+		j loop2
+		
+		
+done2:		move $a0,$t5
+		li $v0,1       #printing factorial
+		syscall
+	
+		li $v0,10
+		syscall
+
+
+specialCase:	add $a0,$zero,1
+		li $v0,1
+		syscall
+	
+		li $v0,10
+		syscall
+	
+	
+	
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+endl:	.asciiz "\n"
+enterNum: .asciiz "Enter number : "
+
+##
+## end of Program3.asm
+
+########################################### PART 4 #########################################
+
+	.text
+# # # Number A # # #
+la $a0,prompt1
+li $v0,4
+syscall
+li $v0,5
+syscall
+move $t0,$v0		 #t0 A
+
+# # # Number B # # #
+la $a0,prompt2
+li $v0,4
+syscall
+li $v0,5
+syscall
+move $t1,$v0		#t1 B
+
+# # # Number C # # #
+la $a0,prompt3
+li $v0,4
+syscall
+li $v0,5
+syscall
+move $t2,$v0  		#t2 C
+
+ # # Number D # # #
+la $a0,prompt4
+li $v0,4
+syscall
+li $v0,5
+syscall
+move $t3,$v0		#t3 D
+
+ # # Number E # # #
+la $a0,prompt5
+li $v0,4
+syscall
+li $v0,5
+syscall
+move $t4,$v0		#t4 E
+
+# # # # # # #
+
+
+sub $t5,$t1,$t0  	# t5 = B-A
+div $t5,$t2
+mfhi $t5		# t5 = (B-A) MOD C
+
+mul $t6,$t3,$t4		# t6 = D*E
+
+add $t7,$t5,$t6
+
+la $a0,prompt6
+li $v0,4
+syscall
+
+li $v0,1
+move $a0,$t7
+syscall
+
+
+li $v0,10
+syscall
+
+	.data
+prompt1: .asciiz "Enter A  : "
+prompt2: .asciiz "Enter B  : "
+prompt3: .asciiz "Enter C  : "
+prompt4: .asciiz "Enter D  : "
+prompt5: .asciiz "Enter E  : "
+prompt6: .asciiz "The result is : "
+
+
+########################################### PART 5 #########################################
+
+		.text
+main:		li $v0,4
+		la $a0,prompt1
+		syscall
+		
+		li $v0,5
+		syscall
+		
+		blt $v0,1,main
+		bgt $v0,100,main
+		
+		move $t0,$v0		#t0 is the size of the array
+		jal getArray
+		
+menu:		la $t1,array		#t1 points the address of the array
+		move $t2,$t0		#t2 is the counter for loops in subprograms
+		li $t3,0		#t3 is the sum for subprograms
+		
+		li $v0,4
+		la $a0,prompt3
+		syscall
+		
+		li $v0,4
+		la $a0,option1
+		syscall
+		
+		li $v0,4
+		la $a0,option2
+		syscall
+		
+		li $v0,4
+		la $a0,option3
+		syscall
+		
+		li $v0,4
+		la $a0,option4
+		syscall
+		
+		li $v0,5
+		syscall
+		
+		beq $v0,1,optionA
+		beq $v0,2,optionB
+		beq $v0,3,optionC
+		beq $v0,4,optionD
+
+optionA:	jal subProgA
+		j menu
+		
+optionB:	jal subProgB
+		j menu
+
+optionC:	jal subProgC
+		j menu
+		
+optionD:	li $v0,10
+		syscall
+		
+		
+#--------------------------------------------------------------------------------------------------------------#
+getArray:	la $t1,array		#t1 points the address of the array
+		move $t2,$t0		#t2 is the counter for loop
+
+loopin:		beqz $t2,donein
+		
+		li $v0,4
+		la $a0,prompt2
+		syscall
+		
+		li $v0,5
+		syscall
+		
+		sw $v0,0($t1)
+		addi $t1,$t1,4
+		subi $t2,$t2,1
+		j loopin
+
+donein:		jr $ra
+#--------------------------------------------------------------------------------------------------------------#
+subProgA:	#la $t1,array		#t1 is the address of the array
+		#move $t2,$t0		#t2 is the counter for loop
+		#li $t3,0		#t3 is the sum
+		
+	
+		li $v0,4
+		la $a0,prompt2
+		syscall
+		
+		li $v0,5
+		syscall
+		
+		move $t4,$v0		#t4 is the input number to be compared
+
+loopA:		beqz $t2,doneA
+		lw $t5,0($t1)
+		bge $t5,$t4,greater
+		add $t3,$t3,$t5
+		
+greater:	addi $t1,$t1,4
+		subi $t2,$t2,1
+		j loopA
+		
+doneA:		li $v0,4
+		la $a0,prompt4
+		syscall
+		
+		li $v0,1
+		move $a0,$t3
+		syscall
+		
+		jr $ra
+#---------------------------------------------------------------------------------------------------------------#
+subProgB:	li $v0,4
+		la $a0,prompt5
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t4,$v0 		#t4 is the first number 
+		
+		li $v0,4
+		la $a0,prompt6
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t5,$v0		#t5 is the second number
+		
+		blt $t4,$t5,loopB 	#t4 should be the smaller number.
+		move $t6,$t4
+		move $t4,$t5
+		move $t5,$t6
+		li $t6,0
+		
+loopB:		beqz $t2,doneB		
+		lw $t6,0($t1)
+		blt $t6,$t4,continue
+		ble $t6,$t5,finish
+continue:	add $t3,$t3,$t6
+finish:		addi $t1,$t1,4
+		subi $t2,$t2,1
+		j loopB
+doneB:		li $v0,4
+		la $a0,prompt4
+		syscall
+		
+		li $v0,1
+		move $a0,$t3
+		syscall
+		
+		jr $ra
+#----------------------------------------------------------------------------------------------------------------#
+subProgC:	li $v0,4
+		la $a0,prompt7
+		syscall
+		
+		li $v0,5
+		syscall
+		beqz $v0,subProgC
+		move $t4,$v0		#t4 is the denominator 
+		
+loopC:		beqz $t2,doneC
+		lw $t5,0($t1)
+		div $t5,$t4
+		mfhi $t6
+		bnez $t6,notDiv
+		addi $t3,$t3,1
+notDiv:		addi $t1,$t1,4
+		subi $t2,$t2,1
+		j loopC
+
+doneC:		li $v0,4
+		la $a0,prompt8
+		syscall
+		
+		li $v0,1
+		move $a0,$t3
+		syscall
+		
+		jr $ra
+		
+		
+		.data
+array: .space 400		
+prompt1: .asciiz "Enter the size of your array (Min 1, Max 100) : "
+prompt2: .asciiz "Enter number : "
+prompt3: .asciiz "\nWhich option do you want to perform?\n"
+prompt4: .asciiz "The sum is : "
+prompt5: .asciiz "Enter first number  : "
+prompt6: .asciiz "Enter second number : "
+prompt7: .asciiz "Enter denominator (Except 0) : "
+prompt8: .asciiz "Number of occurences is : "
+option1: .asciiz "(1) Find summation of the integers which are less than a number\n"
+option2: .asciiz "(2) Find summation of the integers which are out of range\n"
+option3: .asciiz "(3) Display number of occurences which are divisible by an input\n"
+option4: .asciiz "(4) Quit\n"
+
+
